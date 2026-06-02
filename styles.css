@@ -12,6 +12,7 @@
     --color-secondary-hover: #545b62;
     --color-error: #dc3545;
     --color-success: #28a745;
+    --color-warning: #d68102;
     --color-focus: #007bff;
     --color-shadow: rgba(0, 0, 0, 0.1);
     --color-shadow-hover: rgba(0, 0, 0, 0.15);
@@ -43,6 +44,7 @@
     --color-secondary-hover: #6c757d;
     --color-error: #fa5252;
     --color-success: #40c057;
+    --color-warning: #f59f00;
     --color-focus: #4dabf7;
     --color-shadow: rgba(0, 0, 0, 0.3);
     --color-shadow-hover: rgba(0, 0, 0, 0.4);
@@ -63,6 +65,7 @@
         --color-secondary-hover: #6c757d;
         --color-error: #fa5252;
         --color-success: #40c057;
+        --color-warning: #f59f00;
         --color-focus: #4dabf7;
         --color-shadow: rgba(0, 0, 0, 0.3);
         --color-shadow-hover: rgba(0, 0, 0, 0.4);
@@ -414,6 +417,7 @@ input[type="range"],
 input[type="tel"],
 input[type="email"],
 input[type="url"],
+input[type="datetime-local"],
 select {
     padding: var(--spacing-sm);
     border: 1px solid var(--color-border);
@@ -453,6 +457,54 @@ select:focus {
 
 .form-error {
     color: var(--color-error) !important;
+}
+
+/* Collapsible style & branding panel */
+.style-panel {
+    border: 1px solid var(--color-border);
+    border-radius: var(--border-radius);
+    background-color: var(--color-surface);
+    padding: 0 var(--spacing-md);
+}
+
+.style-panel > summary {
+    cursor: pointer;
+    font-weight: 600;
+    color: var(--color-text);
+    padding: var(--spacing-md) 0;
+    list-style: none;
+    user-select: none;
+}
+
+.style-panel > summary::-webkit-details-marker {
+    display: none;
+}
+
+.style-panel > summary::before {
+    content: '▸';
+    display: inline-block;
+    margin-right: var(--spacing-sm);
+    color: var(--color-primary);
+    transition: transform 0.2s ease;
+}
+
+.style-panel[open] > summary::before {
+    transform: rotate(90deg);
+}
+
+.style-panel > summary:hover {
+    color: var(--color-primary);
+}
+
+.style-panel > .form-row,
+.style-panel > .form-hint {
+    margin-bottom: var(--spacing-md);
+}
+
+.style-panel input[type="color"]:disabled,
+.style-panel select:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
 }
 
 /* Mobile optimization for phone inputs */
@@ -804,10 +856,128 @@ input[type="number"] {
     background: var(--color-surface);
 }
 
-.qr-preview svg {
-    max-width: none;
-    max-height: none;
-    flex-shrink: 0;
+.qr-preview svg,
+.qr-preview canvas {
+    width: auto;
+    height: auto;
+    max-width: 100%;
+    max-height: 70vh;
+    /* min-*: 0 defeats the flexbox auto-minimum-size that otherwise keeps the
+       1024px SVG from shrinking to fit the preview box */
+    min-width: 0;
+    min-height: 0;
+    flex-shrink: 1;
+}
+
+/* Make a generated QR feel clickable (opens the full-size modal) */
+.qr-preview:has(svg),
+.qr-preview:has(canvas) {
+    cursor: zoom-in;
+}
+
+/* Full-size QR preview modal */
+.qr-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg);
+}
+
+.qr-modal[hidden] {
+    display: none;
+}
+
+.qr-modal-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(3px);
+}
+
+.qr-modal-content {
+    position: relative;
+    z-index: 1;
+    background: var(--color-bg);
+    padding: var(--spacing-xl);
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+    max-width: 95vw;
+    max-height: 95vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing-md);
+    animation: qrModalIn 0.2s ease-out;
+}
+
+.qr-modal-actions {
+    display: flex;
+    gap: var(--spacing-sm);
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* Export format/resolution selectors */
+.export-options {
+    display: flex;
+    gap: var(--spacing-md);
+    flex-wrap: wrap;
+    margin-bottom: var(--spacing-md);
+}
+
+.export-options .form-group {
+    flex: 1;
+    min-width: 140px;
+}
+
+@keyframes qrModalIn {
+    from { transform: scale(0.96); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+.qr-modal-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: auto;
+}
+
+.qr-modal-body svg,
+.qr-modal-body canvas,
+.qr-modal-body img {
+    width: auto;
+    height: auto;
+    max-width: 86vw;
+    max-height: 82vh;
+    min-width: 0;
+    min-height: 0;
+}
+
+.qr-modal-close {
+    position: absolute;
+    top: 8px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    border-radius: 50%;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.qr-modal-close:hover {
+    background: var(--color-error);
+    color: #fff;
 }
 
 .qr-info {
@@ -1034,6 +1204,50 @@ input[type="number"] {
     color: var(--color-primary);
     margin-top: var(--spacing-xs);
     font-size: var(--font-size-sm);
+}
+
+/* Scannability indicator */
+.scannability {
+    display: none;
+    align-items: center;
+    gap: var(--spacing-xs);
+    margin-top: var(--spacing-sm);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-sm);
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+    border: 1px solid transparent;
+}
+
+.scannability.is-visible {
+    display: flex;
+}
+
+.scannability::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: currentColor;
+    flex-shrink: 0;
+}
+
+.scannability.scannability-good {
+    color: var(--color-success);
+    border-color: var(--color-success);
+    background-color: color-mix(in srgb, var(--color-success) 12%, transparent);
+}
+
+.scannability.scannability-risky {
+    color: var(--color-warning);
+    border-color: var(--color-warning);
+    background-color: color-mix(in srgb, var(--color-warning) 12%, transparent);
+}
+
+.scannability.scannability-bad {
+    color: var(--color-error);
+    border-color: var(--color-error);
+    background-color: color-mix(in srgb, var(--color-error) 12%, transparent);
 }
 
 /* File upload styling */

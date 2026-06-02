@@ -23,6 +23,19 @@ A modern, feature-rich QR code generator built with vanilla HTML, CSS, and JavaS
 - **WiFi Network QR Codes**: Create QR codes that automatically connect devices to WiFi networks
 - **Contact QR Codes (vCard)**: Generate QR codes containing contact information in vCard format
 - **Picture QR Codes**: Embed custom images/logos within QR codes
+- **Email**: Pre-fill the recipient, subject, and message (`mailto:`)
+- **SMS**: Pre-fill a phone number and message (`SMSTO:`)
+- **Phone Call**: Open the dialer with a number ready to call (`tel:`)
+- **WhatsApp**: Open a WhatsApp chat with an optional pre-filled message (`wa.me`)
+- **Geo Location**: Drop a map pin at given coordinates (`geo:`)
+- **Calendar Event**: Add an event to the calendar (iCalendar `VEVENT`)
+- **PayPal**: Link to your free PayPal.Me page with an optional amount
+- **UPI Payment**: Open a UPI app pre-filled to pay (`upi://pay`, India)
+- **Crypto Wallet**: Open a wallet for Bitcoin, Ethereum, or Litecoin (BIP-21)
+
+> 💡 All types are **100% free and client-side** — a QR code is just encoded text, and the
+> scanning device's OS performs the action. No APIs, accounts, or fees are required. Payment
+> types only *pre-fill* the user's own app; no money is processed by this tool.
 
 ### 🎨 Customization Options
 - **Size Control**: Adjustable QR code size from 128px to 1024px
@@ -30,12 +43,25 @@ A modern, feature-rich QR code generator built with vanilla HTML, CSS, and JavaS
 - **Color Customization**: Custom foreground and background colors
 - **Transparent Background**: Option for transparent background
 - **Quiet Zone**: Adjustable margin/quiet zone (0-64px)
-- **Image Integration**: For picture QR codes, customizable image size (10%-50%)
+- **Image Integration**: For picture QR codes, customizable logo size (10%-60%) with a live
+  scannability indicator and optional center-crop to square
+
+### 🖼️ Picture QR Logo Tools
+- **Logo Size**: Scale the embedded logo from 10% up to 60% of the QR code
+- **Live Scannability Indicator**: A Good / Risky / Won't-scan badge that updates as you change
+  the logo size and error-correction level, so you never ship an unscannable code by accident
+- **Error-Correction-Aware Limits**: Oversized logos are automatically clamped back into the
+  scannable range when error correction is lowered
+- **Crop to Square**: Center-crop non-square logos so they aren't stretched
+- **Sharp Output**: Uploads are kept at high resolution (and SVG logos stay vector) so the logo
+  doesn't blur when the QR is downloaded or zoomed
 
 ### 💾 Export & Download
 - **PNG Download**: High-quality PNG format with timestamped filenames
 - **SVG Download**: Scalable vector graphics format
 - **Clipboard Copy**: Copy QR codes directly to clipboard
+- **Full-Size Preview Modal**: Click the preview to open a crisp, full-screen view of the QR
+  code and logo (close with ×, the backdrop, or Escape)
 - **Print Support**: Optimized for printing
 
 ### 🎯 User Experience
@@ -99,9 +125,20 @@ qr-code/
 ### Picture QR Code Generation
 1. Select "Picture QR Code" from the QR Code Type dropdown
 2. Enter the text or URL to encode
-3. Upload an image file (PNG, JPG, JPEG, GIF, WebP, max 2MB)
-4. Adjust image size using the slider (10%-50%)
-5. Generate the QR code with embedded image
+3. Upload an image file (PNG, JPG, JPEG, GIF, WebP, SVG, max 2MB)
+4. Adjust logo size using the slider (10%-60%) and watch the scannability indicator
+5. Optionally enable "Crop image to square" so non-square logos aren't stretched
+6. Generate the QR code with embedded image
+
+### Other Content Types (Email, SMS, Phone, WhatsApp, Geo, Calendar, PayPal, UPI, Crypto)
+1. Pick the type from the QR Code Type dropdown (grouped under Contact & messaging,
+   Location & events, and Payments)
+2. The relevant input fields appear automatically — fill in the required fields (marked `*`)
+3. Click "Generate QR Code"
+4. Scan with a phone to trigger the action (open mail/dialer/maps/wallet, add an event, etc.)
+
+> Scanner support: `mailto:`, `tel:`, `SMSTO:`, and `geo:` are universal; calendar events are
+> widely supported; **UPI and crypto require a compatible app installed** on the scanning device.
 
 ## 🎨 Customization Options
 
@@ -117,9 +154,13 @@ qr-code/
 - **Margin**: 0-64px quiet zone around the QR code
 
 ### Image Integration (Picture QR Codes)
-- **Supported Formats**: PNG, JPG, JPEG, GIF, WebP
+- **Supported Formats**: PNG, JPG, JPEG, GIF, WebP, SVG
 - **File Size Limit**: 2MB maximum
-- **Image Size**: 10% to 50% of QR code size
+- **Logo Size**: 10% to 60% of QR code size
+- **Scannability Indicator**: Live Good / Risky / Won't-scan feedback based on size + error correction
+- **Crop to Square**: Optional center-crop so non-square logos aren't stretched
+- **High-Resolution Handling**: Logos are kept sharp (up to 1024px; SVGs stay vector) for crisp
+  downloads and zooming
 - **Drag & Drop**: Support for drag and drop file upload
 - **Preview**: Real-time image preview before generation
 
@@ -221,6 +262,16 @@ Contributions are welcome! Please feel free to submit issues, feature requests, 
 
 ## 📝 Changelog
 
+### Version 1.1.0
+- **9 new QR content types**: Email, SMS, Phone Call, WhatsApp, Geo Location, Calendar Event,
+  PayPal, UPI, and Crypto Wallet — all free and client-side
+- **Picture QR logo upgrades**: logo size raised to 60%, live scannability indicator,
+  error-correction-aware size clamping, and an optional crop-to-square
+- **Sharper logos**: high-resolution image handling (up to 1024px) with vector SVG support, so
+  logos no longer blur when downloaded or zoomed
+- **Full-size preview modal**: click the preview to view the QR code and logo at full size
+- **Responsive preview fix**: large (e.g. 1024px) QR codes now scale to fit the preview box
+
 ### Version 1.0.0
 - Initial release with core QR code generation features
 - Support for multiple QR code types
@@ -231,6 +282,7 @@ Contributions are welcome! Please feel free to submit issues, feature requests, 
 ## 🐛 Known Issues
 
 - Picture QR codes require high error correction for optimal readability
+- UPI and crypto QR codes need a compatible payment/wallet app on the scanning device
 - Some older browsers may not support all features
 - Large image files may cause performance issues on low-end devices
 
@@ -238,9 +290,8 @@ Contributions are welcome! Please feel free to submit issues, feature requests, 
 
 - QR code history and favorites
 - Batch QR code generation
-- Advanced styling options (gradients, patterns)
-- QR code scanning functionality
-- Social media sharing integration
+- Advanced styling options (gradients, dot/corner shapes, patterns)
+- QR code scanning/decoding functionality
 - API for programmatic QR code generation
 
 ---
@@ -248,5 +299,5 @@ Contributions are welcome! Please feel free to submit issues, feature requests, 
 **Note**: This QR Code Generator was created as a learning exercise and demonstrates modern web development practices. While functional and feature-rich, it may contain imperfections typical of rapid prototyping.
 <!--
 Search Tags:
-qr code, qr code generator, qr code generator javascript, qr code generator html css js, qr code with logo, qr code for wifi, qr code for contact, vCard qr code, qr code tool, free qr code generator, qr code app, qr code web app, customizable qr code, modern qr code generator, qr code export png svg, qr code maker, qr code generator open source
+qr code, qr code generator, qr code generator javascript, qr code generator html css js, qr code with logo, qr code for wifi, qr code for contact, vCard qr code, email qr code, sms qr code, phone qr code, whatsapp qr code, geo location qr code, calendar event qr code, paypal qr code, upi qr code, crypto qr code, bitcoin qr code, qr code tool, free qr code generator, qr code app, qr code web app, customizable qr code, modern qr code generator, qr code export png svg, qr code maker, qr code generator open source
 -->

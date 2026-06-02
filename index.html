@@ -7,6 +7,7 @@
     <meta name="description" content="Generate custom QR codes with colors, logos, and download options">
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.6.0-rc.1/lib/qr-code-styling.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 </head>
 <body>
     <nav class="navbar">
@@ -49,6 +50,21 @@
                             <option value="wifi">WiFi Network</option>
                             <option value="contact">Contact (vCard)</option>
                             <option value="picture">Picture QR Code</option>
+                            <optgroup label="Contact &amp; messaging">
+                                <option value="email">Email</option>
+                                <option value="sms">SMS</option>
+                                <option value="phone">Phone Call</option>
+                                <option value="whatsapp">WhatsApp</option>
+                            </optgroup>
+                            <optgroup label="Location &amp; events">
+                                <option value="geo">Geo Location</option>
+                                <option value="event">Calendar Event</option>
+                            </optgroup>
+                            <optgroup label="Payments">
+                                <option value="paypal">PayPal</option>
+                                <option value="upi">UPI Payment</option>
+                                <option value="crypto">Crypto Wallet</option>
+                            </optgroup>
                         </select>
                     </div>
 
@@ -259,18 +275,36 @@
                                 id="picture-size"
                                 name="pictureSize"
                                 min="10"
-                                max="50"
-                                value="50"
+                                max="60"
+                                value="35"
                                 step="1"
                                 aria-describedby="picture-size-hint"
                             />
-                            <div class="range-value" id="picture-size-value">50%</div>
+                            <div class="range-value" id="picture-size-value">35%</div>
+                            <div class="scannability" id="picture-scannability" role="status" aria-live="polite"></div>
                             <div id="picture-size-hint" class="form-hint">
-                                Adjust the size of the image in the QR code (10% - 50% of QR code size)
+                                Adjust how much of the QR code the logo covers. You can go large for a bold logo — watch the indicator above and keep error correction on High so it still scans.
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="checkbox-group">
+                                <input type="checkbox" id="picture-crop-square" name="pictureCropSquare" />
+                                <label for="picture-crop-square">Crop image to square (recommended for logos)</label>
+                            </div>
+                            <div class="form-hint">
+                                Center-crops non-square images so the logo isn't stretched. Uncheck to keep the original shape.
                             </div>
                         </div>
 
 
+                    </div>
+
+                    <div id="dynamic-input-section" class="input-section" style="display: none;">
+                        <div class="form-group">
+                            <div id="dynamic-fields"></div>
+                            <div id="dynamic-type-hint" class="form-hint"></div>
+                        </div>
                     </div>
 
                     <div class="form-row">
@@ -349,7 +383,101 @@
                         </div>
                     </div>
 
+                    <details class="style-panel">
+                        <summary>🎨 Style &amp; Branding</summary>
 
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="qr-dot-style">Dot Style</label>
+                                <select id="qr-dot-style" name="dotStyle">
+                                    <option value="square">Square</option>
+                                    <option value="dots">Dots</option>
+                                    <option value="rounded" selected>Rounded</option>
+                                    <option value="classy">Classy</option>
+                                    <option value="classy-rounded">Classy Rounded</option>
+                                    <option value="extra-rounded">Extra Rounded</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="qr-corner-square-style">Corner Frame Style</label>
+                                <select id="qr-corner-square-style" name="cornerSquareStyle">
+                                    <option value="" selected>Auto (match dots)</option>
+                                    <option value="square">Square</option>
+                                    <option value="dot">Dot</option>
+                                    <option value="extra-rounded">Extra Rounded</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="qr-corner-dot-style">Corner Center Style</label>
+                                <select id="qr-corner-dot-style" name="cornerDotStyle">
+                                    <option value="" selected>Auto (match dots)</option>
+                                    <option value="square">Square</option>
+                                    <option value="dot">Dot</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="qr-corner-color">Corner Color</label>
+                                <input type="color" id="qr-corner-color" name="cornerColor" value="#111111" disabled />
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="qr-corner-match" name="cornerMatch" checked />
+                                    <label for="qr-corner-match">Match foreground</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="qr-gradient-color">Gradient Color</label>
+                                <input type="color" id="qr-gradient-color" name="gradientColor" value="#007bff" disabled />
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="qr-gradient-enabled" name="gradientEnabled" />
+                                    <label for="qr-gradient-enabled">Use gradient</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="qr-gradient-type">Gradient Direction</label>
+                                <select id="qr-gradient-type" name="gradientType" disabled>
+                                    <option value="linear-0">Linear →</option>
+                                    <option value="linear-45" selected>Linear ↘</option>
+                                    <option value="linear-90">Linear ↓</option>
+                                    <option value="radial">Radial ◎</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-hint">
+                            Tip: keep enough contrast between the dots (and gradient) and the
+                            background, or the code may not scan.
+                        </div>
+
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="qr-frame-text">Frame Label</label>
+                                <input type="text" id="qr-frame-text" name="frameText" value="SCAN ME" maxlength="20" disabled />
+                                <div class="checkbox-group">
+                                    <input type="checkbox" id="qr-frame-enabled" name="frameEnabled" />
+                                    <label for="qr-frame-enabled">Add a frame with a label</label>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="qr-frame-color">Frame Color</label>
+                                <input type="color" id="qr-frame-color" name="frameColor" value="#111111" disabled />
+                            </div>
+
+                            <div class="form-group">
+                                <label for="qr-frame-position">Label Position</label>
+                                <select id="qr-frame-position" name="framePosition" disabled>
+                                    <option value="bottom" selected>Bottom</option>
+                                    <option value="top">Top</option>
+                                </select>
+                            </div>
+                        </div>
+                    </details>
 
                     <div class="form-actions">
                         <button type="submit" class="btn btn-primary" id="generate-btn">
@@ -369,12 +497,32 @@
                     <div id="qr-info" class="qr-info" aria-live="polite"></div>
                 </div>
 
+                <div class="export-options">
+                    <div class="form-group">
+                        <label for="export-format">Format</label>
+                        <select id="export-format" name="exportFormat">
+                            <option value="png" selected>PNG</option>
+                            <option value="jpeg">JPEG</option>
+                            <option value="webp">WebP</option>
+                            <option value="svg">SVG (vector)</option>
+                            <option value="pdf">PDF</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="export-resolution">Resolution</label>
+                        <select id="export-resolution" name="exportResolution">
+                            <option value="0" selected>Match preview</option>
+                            <option value="512">512 px</option>
+                            <option value="1024">1024 px</option>
+                            <option value="2048">2048 px</option>
+                            <option value="4096">4096 px (print)</option>
+                        </select>
+                    </div>
+                </div>
+
                 <div class="download-actions">
-                    <button class="btn btn-outline" id="download-png" disabled>
-                        Download PNG
-                    </button>
-                    <button class="btn btn-outline" id="download-svg" disabled>
-                        Download SVG
+                    <button class="btn btn-outline" id="download-btn" disabled>
+                        Download
                     </button>
                     <button class="btn btn-outline" id="copy-clipboard" disabled>
                         Copy to Clipboard
@@ -452,6 +600,18 @@
             <p>Designed and Developed by <strong>Abubakkar Shahzad</strong></p>
         </div>
     </footer>
+
+    <div id="qr-modal" class="qr-modal" role="dialog" aria-modal="true" aria-label="QR code full preview" hidden>
+        <div class="qr-modal-backdrop" data-close></div>
+        <div class="qr-modal-content">
+            <button type="button" class="qr-modal-close" id="qr-modal-close" aria-label="Close preview">&times;</button>
+            <div class="qr-modal-body" id="qr-modal-body"></div>
+            <div class="qr-modal-actions">
+                <button type="button" class="btn btn-outline" id="modal-download-btn">Download</button>
+                <button type="button" class="btn btn-outline" id="modal-copy-btn">Copy to Clipboard</button>
+            </div>
+        </div>
+    </div>
 
     <script src="app.js"></script>
 </body>
